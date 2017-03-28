@@ -1,0 +1,9 @@
+       queryTime = (datetime.datetime.today() -
+                    datetime.timedelta(days=180)).strftime("%Y%m%d %H:%M:%S")
+       # String queryTime = DateTime.Now.AddMonths(-6).ToString("yyyyMMdd HH:mm:ss")
+       self.reqHistoricalData(4101, ContractSamples.USStockAtSmart(), queryTime,
+                              "1 M", "1 day", "MIDPOINT", 1, 1, [])
+       self.reqHistoricalData(4001, ContractSamples.EurGbpFx(), queryTime,
+                              "1 M", "1 day", "MIDPOINT", 1, 1, [])
+       self.reqHistoricalData(4002, ContractSamples.EuropeanStock(), queryTime,
+                              "10 D", "1 min", "TRADES", 1, 1, [])
