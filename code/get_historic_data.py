@@ -3,6 +3,8 @@
 # https://interactivebrokers.github.io/tws-api/historical_data.html#hd_request&gsc.tab=0
 # https://interactivebrokers.github.io/tws-api/classIBApi_1_1EClient.html#a72fc193c4d50f738b6092a174988f093&gsc.tab=0
 
+import sys
+sys.path.insert(0,"/home/ews/ibapi/dl/twsapi/IBJts/samples/Python/Testbed")
 
 
 from ibapi.wrapper import EWrapper
@@ -12,7 +14,7 @@ from ibapi.contract import *
 from threading import Thread
 import queue
 import datetime
-import paramiko
+import ContractSamples
 
 # begin TestWrapper
 class TestWrapper(EWrapper):
@@ -53,7 +55,6 @@ class TestWrapper(EWrapper):
 # end user added functions
   ######### Send Functions ##########
     def ewsTest(self):
-        paramiko.util.log_to_file("filename.log")
         #current_time = 'hello, world'
         queryTime = (datetime.datetime.today() - datetime.timedelta(days=180)).strftime("%Y%m%d %H:%M:%S")
         contract = Contract()
