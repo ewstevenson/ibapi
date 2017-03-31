@@ -14,7 +14,7 @@ from ibapi.contract import *
 from threading import Thread
 import queue
 import datetime
-import ContractSamples
+from ContractSamples import *
 
 # begin TestWrapper
 class TestWrapper(EWrapper):
@@ -55,17 +55,27 @@ class TestWrapper(EWrapper):
 # end user added functions
   ######### Send Functions ##########
     def ewsTest(self):
-        #current_time = 'hello, world'
-        queryTime = (datetime.datetime.today() - datetime.timedelta(days=180)).strftime("%Y%m%d %H:%M:%S")
+        numDays = 180 
+        queryTime = (datetime.datetime.today() - datetime.timedelta(days=numDays)).strftime("%Y%m%d %H:%M:%S")
         contract = Contract()
         contract.symbol = "USD"
         contract.secType = "CASH"
         contract.currency = "JPY"
         contract.exchange = "IDEALPRO"
+        try:
+            earliestDate = self.reqHeadTimeStamp(4103, ContractSamples.USStockAtSmart(), "TRADES", 0, 1)
+            print(earliestDate)
+            #historicData = self.reqHistoricalData(4101, ContractSamples.USStockAtSmart(), queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
+            historicData = self.reqHistoricalData(4001, ContractSamples.EurGbpFx(), queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
+            #historicData = self.reqHistoricalData(4001, contract, queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
+        except queue.Empty:
+            print("Exceeded maimum wait for wrapper to respond")
+            current_time =  None
+        while self.wrapper.is_error():
+            print(self.get_error())
 
-        #self.reqHistoricalData(4001, ContractSamples.EurGbpFx(), queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
-        self.reqHistoricalData(4001, contract, queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
-        return queryTime
+        return historicData
+
 
 ######### Recieve Functions ############
     def historicalData(self, reqId: TickerId, date: str, open: float, high: float,
@@ -76,9 +86,10 @@ class TestWrapper(EWrapper):
         print("HistoricalData. ", reqId, " Date:", date, "Open:", open,
               "High:", high, "Low:", low, "Close:", close, "Volume:", volume,
               "Count:", barCount, "WAP:", WAP, "HasGaps:", hasGaps)
-        def historicalDataEnd(self, reqId: int, start: str, end: str):
-            super().historicalDataEnd(reqId, start, end)
-            print("HistoricalDataEnd ", reqId, "from", start, "to", end)
+
+    def historicalDataEnd(self, reqId: int, start: str, end: str):
+        super().historicalDataEnd(reqId, start, end)
+        print("HistoricalDataEnd ", reqId, "from", start, "to", end)
 
 
 # end user added functions
@@ -118,7 +129,6 @@ if __name__ == '__main__':
 
     app = TestApp("127.0.0.1", 4001, 10)
 
-    query_time  = app.ewsTest()
-    print(query_time)
-
+    historicData  = app.ewsTest()
+    print(historicData)
     app.disconnect()
