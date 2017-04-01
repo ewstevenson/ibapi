@@ -51,7 +51,7 @@ class TestWrapper(EWrapper):
 
   ######### Send Functions ##########
     def getHistory(self):
-        numDays = 5 
+        numDays = 3 
         queryTime = (datetime.datetime.today() - datetime.timedelta(days=numDays)).strftime("%Y%m%d %H:%M:%S")
         contract = Contract()
         contract.symbol = "USD"
@@ -59,11 +59,9 @@ class TestWrapper(EWrapper):
         contract.currency = "JPY"
         contract.exchange = "IDEALPRO"
         try:
-            earliestDate = self.reqHeadTimeStamp(4103, ContractSamples.USStockAtSmart(), "TRADES", 0, 1)
+            earliestDate = self.reqHeadTimeStamp(4101, contract, "BID", 0, 1)
             print(earliestDate)
-            #historicData = self.reqHistoricalData(4101, ContractSamples.USStockAtSmart(), queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
-            #historicData = self.reqHistoricalData(4001, ContractSamples.EurGbpFx(), queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
-            historicData = self.reqHistoricalData(4001, contract, queryTime, "1 M", "1 day", "MIDPOINT", 1, 1, [])
+            historicData = self.reqHistoricalData(4001, contract, queryTime, "3 D", "1 min", "BID_ASK", 0, 2, [])
         except queue.Empty:
             print("Exceeded maimum wait for wrapper to respond")
             current_time =  None
