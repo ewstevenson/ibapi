@@ -51,17 +51,22 @@ class TestWrapper(EWrapper):
 
   ######### Send Functions ##########
     def getHistory(self):
-        numDays = 3 
-        queryTime = (datetime.datetime.today() - datetime.timedelta(days=numDays)).strftime("%Y%m%d %H:%M:%S")
+        numDays = 5
+        #endDate = (datetime.datetime.today() - datetime.timedelta(days=numDays)).strftime("%Y%m%d %H:%M:%S")
+        endDate = datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")
         contract = Contract()
         contract.symbol = "USD"
         contract.secType = "CASH"
         contract.currency = "JPY"
         contract.exchange = "IDEALPRO"
         try:
-            earliestDate = self.reqHeadTimeStamp(4101, contract, "BID", 0, 1)
-            print(earliestDate)
-            historicData = self.reqHistoricalData(4001, contract, queryTime, "3 D", "1 min", "BID_ASK", 0, 2, [])
+#            earliestDate = self.reqHeadTimeStamp(4101, contract, "BID", 0, 1)
+#            print(earliestDate)
+
+# https://interactivebrokers.github.io/tws-api/classIBApi_1_1EClient.html#a72fc193c4d50f738b6092a174988f093&gsc.tab=0
+            daysBack = str(numDays)+" D"
+            historicData = self.reqHistoricalData(4001, contract, endDate, daysBack, "1 min", "BID_ASK", 0, 2, [])
+
         except queue.Empty:
             print("Exceeded maimum wait for wrapper to respond")
             current_time =  None
@@ -76,19 +81,20 @@ class TestWrapper(EWrapper):
                        WAP: float, hasGaps: int):
         super().historicalData(reqId, date, open, high, low, close, volume,
                                barCount, WAP, hasGaps)
-        print("HistoricalData. ", reqId, " Date:", date, "Open:", open,
-              "High:", high, "Low:", low, "Close:", close, "Volume:", volume,
-              "Count:", barCount, "WAP:", WAP, "HasGaps:", hasGaps)
-        print("In the historicalData function!")
+       # print("HistoricalData. ", reqId, " Date:", date, "Open:", open,
+       #       "High:", high, "Low:", low, "Close:", close, "Volume:", volume,
+       #       "Count:", barCount, "WAP:", WAP, "HasGaps:", hasGaps)
+        sql = "INSERT INTO `USDJPY` ( `timestamp`, `open`, `high`, `low`, `close`, `volume`, `count`, `wap`, `hasGaps` ) VALUES ( '"+str(date)+"', '"+str(open)+"', '"+str(high)+"', '"+str(low)+"', '"+str(close)+"', '"+str(volume)+"', '"+str(barCount)+"', '"+str(WAP)+"', '"+str(hasGaps)+"' );"
+        print(sql)
         return open
 
     def historicalDataEnd(self, reqId: int, start: str, end: str):
         super().historicalDataEnd(reqId, start, end)
-        print("HistoricalDataEnd ", reqId, "from", start, "to", end)
+        #print("HistoricalDataEnd ", reqId, "from", start, "to", end)
         return end
 
     def headTimestamp(self, reqId:int, headTimestamp:str):
-        print("HeadTimestamp: ", reqId, " ", headTimestamp)
+        #print("HeadTimestamp: ", reqId, " ", headTimestamp)
         return headTimestamp
 
 
@@ -129,5 +135,5 @@ if __name__ == '__main__':
     app = TestApp("127.0.0.1", 4001, 10)
 
     historicData = app.getHistory()
-    print(historicData)
+    #print(historicData)
     #app.disconnect()
