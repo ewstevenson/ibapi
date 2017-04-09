@@ -46,26 +46,27 @@ class TestWrapper(EWrapper):
         ## Overriden method
         errormsg = "IB error id %d errorcode %d string %s" % (id, errorCode, errorString)
         self._my_errors.put(errormsg)
+        print(errormsg)
 # end error handling 
 # begin user add functions
 
   ######### Send Functions ##########
     def getHistory(self):
-        numDays = 5
+        numDays = 30
         #endDate = (datetime.datetime.today() - datetime.timedelta(days=numDays)).strftime("%Y%m%d %H:%M:%S")
         endDate = datetime.datetime.today().strftime("%Y%m%d %H:%M:%S")
         contract = Contract()
-        contract.symbol = "USD"
-        contract.secType = "CASH"
-        contract.currency = "JPY"
-        contract.exchange = "IDEALPRO"
+        contract.symbol = "SPY"
+        contract.secType = "STK"
+        contract.currency = "USD"
+        contract.exchange = "ARCA"
         try:
 #            earliestDate = self.reqHeadTimeStamp(4101, contract, "BID", 0, 1)
 #            print(earliestDate)
 
 # https://interactivebrokers.github.io/tws-api/classIBApi_1_1EClient.html#a72fc193c4d50f738b6092a174988f093&gsc.tab=0
             daysBack = str(numDays)+" D"
-            historicData = self.reqHistoricalData(4001, contract, endDate, daysBack, "1 min", "BID_ASK", 0, 2, [])
+            historicData = self.reqHistoricalData(4001, contract, endDate, daysBack, "30 mins", "TRADES", 0, 2, [])
 
         except queue.Empty:
             print("Exceeded maimum wait for wrapper to respond")
@@ -133,6 +134,7 @@ if __name__ == '__main__':
     ## ipaddress is 127.0.0.1 if one same machine, clientid is arbitrary
 
     app = TestApp("127.0.0.1", 4001, 10)
+    #app = TestApp("10.1.10.70", 4001, 10)
 
     historicData = app.getHistory()
     #print(historicData)
